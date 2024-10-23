@@ -33,16 +33,29 @@ export const GET = async (req: Request) => {
       {
         type: "transaction",
         label: "Create Challenge",
-        href: "/api/actions/create-challenge?truth1={truth1}&truth2={truth2}&lie={lie}&competitors={competitors}&amount={amount}",
+        href: "/api/actions/create-challenge?vert_set={vert_set}&hor_set={hor_set}&amount={amount}",
         parameters: [
-          { name: "truth1", label: "Truth 1", required: true, type: "text" },
-          { name: "truth2", label: "Truth 2", required: true, type: "text" },
-          { name: "lie", label: "Lie", required: true, type: "text" },
           {
-            name: "competitors",
-            label: "Total Competitors",
+            name: "vert_set",
+            label: "(Top, Middle, Bottom)",
             required: true,
-            type: "number",
+            type: "select",
+            options: [
+              { value: "top", label: "Top" },
+              { value: "middle", label: "Middle" },
+              { value: "bottom", label: "Bottom" },
+            ],
+          },
+          {
+            name: "hor_set",
+            label: "(Left, Center, Right)",
+            required: true,
+            type: "select",
+            options: [
+              { value: "left", label: "Left" },
+              { value: "center", label: "Center" },
+              { value: "right", label: "Right" },
+            ],
           },
           {
             name: "amount",
@@ -55,13 +68,14 @@ export const GET = async (req: Request) => {
     ];
     const payload: ActionGetResponse = {
       type: "action",
-      title: "Truth N Lie",
+      title: "Goalie",
       icon: new URL("/logo.png", requestUrl.origin).toString(),
       description:
-        "Create a new challenge for the 2 Truths and 1 Lie game. \nProvide two truths and one lie, and let your friend guess which one is the lie.",
+        "Create a new challenge for the Goalie game. \nSelect the position where you want to shoot, and let your friend try to block your goal.",
       label: "Create Challenge",
       links: { actions },
     };
+    console.log(headers);
     return Response.json(payload, { headers });
   } catch (err) {
     console.error(err);
@@ -85,7 +99,7 @@ export const OPTIONS = async () => Response.json(null, { headers });
 export const POST = async (req: Request) => {
   try {
     const requestUrl = new URL(req.url);
-    const { truth1, truth2, lie, competitors, amount } =
+    const { vert_set, hor_set, amount } =
       validatedCreateChallengeQueryParams(requestUrl);
     const body: ActionPostRequest = await req.json();
 
@@ -122,11 +136,11 @@ export const POST = async (req: Request) => {
       fields: {
         type: "transaction",
         transaction,
-        message: "Create Truth N Lie Challenge",
+        message: "Create Goalie Challenge",
         links: {
           next: {
             type: "post",
-            href: `/api/actions/create-challenge/next-action?truth1=${truth1}&truth2=${truth2}&lie=${lie}&amount=${amount}&competitors=${competitors}`,
+            href: `/api/actions/create-challenge/next-action?vert_set=${vert_set}&hor_set=${hor_set}&amount=${amount}`,
           },
         },
       },

@@ -39,26 +39,22 @@ export async function getUser(wallet: string) {
  * @param wallet - The wallet address of the user creating the challenge.
  * @param maxChallengers - The maximum number of challengers allowed.
  * @param statements - An array of three statements.
- * @param lieIndex - The index of the lie in the statements array.
+ * @param gridIndex - The index of the lie in the statements array.
  * @param totalAmount - The total amount to be bet on the challenge.
  * @param createChallengeSig - The signature of the create challenge transaction.
  * @returns The ID of the newly created challenge.
- * @throws Will throw an error if the number of statements is not 3 or if the lieIndex is out of range.
+ * @throws Will throw an error if the number of statements is not 3 or if the gridIndex is out of range.
  */
 export async function createChallenge(
   wallet: string,
-  maxChallengers: number,
-  statements: string[],
-  lieIndex: number,
+  gridIndex: number,
   totalAmount: number,
   createChallengeSig: string
 ) {
   // validations
-  if (statements.length !== 3) {
-    throw new Error("There must be exactly 3 statements");
-  }
-  if (lieIndex < 0 || lieIndex > 2) {
-    throw new Error("lieIndex must be between 0 and 2");
+
+  if (gridIndex < 1 || gridIndex > 9) {
+    throw new Error("gridIndex must be between 0 and 2");
   }
 
   const existingWallet = await db.user.findUnique({
@@ -72,9 +68,7 @@ export async function createChallenge(
   const challenge = await db.challenge.create({
     data: {
       wallet,
-      maxChallengers,
-      statements,
-      lieIndex,
+      gridIndex,
       totalAmount,
       createChallengeSig,
     },
@@ -152,6 +146,7 @@ export async function addChallenger(
   challengeId: string,
   wallet: string,
   guessSignature: string,
+  selected: number,
   correct: boolean
 ) {
   const existingWallet = await db.user.findUnique({
@@ -171,6 +166,7 @@ export async function addChallenger(
           wallet,
         },
       },
+      selectedGrid: selected,
       [correct ? "correctGuessesSig" : "correctGuessesSig"]: {
         push: guessSignature,
       },

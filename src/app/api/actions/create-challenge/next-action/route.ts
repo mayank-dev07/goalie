@@ -1,6 +1,6 @@
 import { createChallenge, createUserIfNotExists } from "@/lib/dbUtils";
 import {
-  shuffleArray,
+  calculateGridIndex,
   validatedCreateChallengeQueryParams,
 } from "@/lib/helper";
 import {
@@ -19,7 +19,7 @@ const headers = createActionHeaders();
  * @param req - The request object.
  * @returns A response indicating the method is not supported.
  */
-export const GET = async (req: Request) => {
+export const GET = async () => {
   return Response.json({ message: "Method not supported" }, { headers });
 };
 
@@ -37,7 +37,7 @@ export const OPTIONS = async () => Response.json(null, { headers });
 export const POST = async (req: Request) => {
   try {
     const requestUrl = new URL(req.url);
-    const { truth1, truth2, lie, competitors, amount } =
+    const { vert_set, hor_set, amount } =
       validatedCreateChallengeQueryParams(requestUrl);
     const body: NextActionPostRequest = await req.json();
 
@@ -46,6 +46,7 @@ export const POST = async (req: Request) => {
     try {
       account = new PublicKey(body.account);
     } catch (err) {
+      console.log(err);
       throw 'Invalid "account" provided';
     }
 
@@ -54,32 +55,30 @@ export const POST = async (req: Request) => {
       signature = body.signature!;
       if (!signature) throw "Invalid signature";
     } catch (err) {
+      console.log(err);
       throw 'Invalid "signature" provided';
     }
 
     console.log(
-      `Creating challenge with truth1: ${truth1}, truth2: ${truth2}, lie: ${lie}, competitors: ${competitors}, amount: ${amount} and signature: ${signature}, account: ${account.toBase58()}`
+      `Creating challenge with vert_set: ${vert_set}, hor_set: ${hor_set}, amount: ${amount} and signature: ${signature}, account: ${account.toBase58()}`
     );
 
     // Create user if not exists
     try {
       await createUserIfNotExists(account.toBase58(), "User");
     } catch (err) {
+      console.log(err);
       throw "Failed to create user";
     }
 
-    const statements = [truth1, truth2, lie];
-    const shuffledStatements = shuffleArray(statements);
-    const lieIndex = shuffledStatements.indexOf(lie);
+    const gridIndex = calculateGridIndex(vert_set, hor_set) + 1;
 
     // Create challenge
     let challengeId: string;
     try {
       challengeId = await createChallenge(
         account.toBase58(),
-        competitors,
-        shuffledStatements,
-        lieIndex,
+        gridIndex,
         amount,
         signature
       );

@@ -42,6 +42,8 @@ const headers = createActionHeaders();
  * 7. Catches and logs any unknown errors, returning a generic error response.
  */
 export const GET = async (req: Request) => {
+  console.log("request url", req.url);
+
   try {
     const requestUrl = new URL(req.url);
     const { challengeId } = validatedChallengeQueryParams(requestUrl);
@@ -59,11 +61,8 @@ export const GET = async (req: Request) => {
       return Response.json(actionError, { status: 404, headers });
     }
     const challenger = challenge.wallet;
-    const totalCurrentChallengers =
-      challenge.correctGuessesSig.length + challenge.incorrectGuessesSig.length;
-    const availableChallengers =
-      challenge.maxChallengers - totalCurrentChallengers;
-    if (availableChallengers === 0) {
+
+    if (challenge.selectedGrid !== null) {
       // just say that challenge is already completed
       const completedAction: CompletedAction = {
         type: "completed",
@@ -94,17 +93,28 @@ export const GET = async (req: Request) => {
       {
         type: "transaction",
         label: "Submit Guess",
-        href: `/api/actions/challenge?challengeId=${challengeId}&guess={guess}&bet={bet}`,
+        href: `/api/actions/challenge?challengeId=${challengeId}&vert_set={vert_set}&hor_set={hor_set}&bet={bet}`,
         parameters: [
           {
-            name: "guess",
-            label: "Your Guess",
+            name: "vert_set",
+            label: "(Top, Middle, Bottom)",
             required: true,
-            type: "radio",
+            type: "select",
             options: [
-              { label: challenge.statements[0], value: "0" },
-              { label: challenge.statements[1], value: "1" },
-              { label: challenge.statements[2], value: "2" },
+              { value: "top", label: "Top" },
+              { value: "middle", label: "Middle" },
+              { value: "bottom", label: "Bottom" },
+            ],
+          },
+          {
+            name: "hor_set",
+            label: "(Left, Center, Right)",
+            required: true,
+            type: "select",
+            options: [
+              { value: "left", label: "Left" },
+              { value: "center", label: "Center" },
+              { value: "right", label: "Right" },
             ],
           },
           {
@@ -114,9 +124,7 @@ export const GET = async (req: Request) => {
             type: "radio",
             options: [
               {
-                label: `Match Bid: ${
-                  challenge.totalAmount / challenge.maxChallengers
-                } SOL`,
+                label: `Match Bid: ${challenge.totalAmount} SOL`,
                 value: "play",
               },
               { label: "Give Up", value: "giveup" },
@@ -127,9 +135,9 @@ export const GET = async (req: Request) => {
     ];
     const payload: ActionGetResponse = {
       type: "action",
-      title: "Truth N Lie",
+      title: "Goalie",
       icon: new URL("/logo.png", requestUrl.origin).toString(),
-      description: `Accept the challenge and guess which of the three statements is a lie. Challenged by ${challenger}`,
+      description: `Accept the challenge and guess the grid where the striker is shooting. Challenged by ${challenger}`,
       label: "Accept Challenge",
       links: { actions },
     };
@@ -150,7 +158,7 @@ export const POST = async (req: Request) => {
   try {
     const requestUrl = new URL(req.url);
     const body: ActionPostRequest = await req.json();
-    const { guess, bet, challengeId } =
+    const { vert_set, hor_set, bet, challengeId } =
       validatedPOSTChallengeQueryParams(requestUrl);
 
     // Validate the client-provided input
@@ -179,8 +187,7 @@ export const POST = async (req: Request) => {
     let amount_in_lamports: number;
 
     if (bet === "play") {
-      amount_in_lamports =
-        (challenge.totalAmount / challenge.maxChallengers) * LAMPORTS_PER_SOL;
+      amount_in_lamports = challenge.totalAmount * LAMPORTS_PER_SOL;
     } else {
       amount_in_lamports = 1; // 1 lamport to give up
     }
@@ -206,11 +213,11 @@ export const POST = async (req: Request) => {
       fields: {
         type: "transaction",
         transaction,
-        message: "Create Truth N Lie Challenge",
+        message: "Create Goalie Challenge",
         links: {
           next: {
             type: "post",
-            href: `/api/actions/challenge/next-action?challengeId=${challengeId}&guess=${guess}&bet=${bet}`,
+            href: `/api/actions/challenge/next-action?challengeId=${challengeId}&vert_set=${vert_set}&hor_set=${hor_set}&bet=${bet}`,
           },
         },
       },

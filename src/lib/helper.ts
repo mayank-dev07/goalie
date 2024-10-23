@@ -1,55 +1,20 @@
-/**
- * Validates and extracts query parameters from the given URL for creating a challenge.
- *
- * @param {URL} requestUrl - The URL containing the query parameters.
- * @returns {Object} An object containing the validated query parameters:
- * - `truth1` {string}: The first truth statement.
- * - `truth2` {string}: The second truth statement.
- * - `lie` {string}: The lie statement.
- * - `competitors` {number}: The number of competitors, must be a positive number.
- * - `amount` {number}: The amount, must be a positive number.
- *
- * @throws Will throw an error if any of the required query parameters are missing or invalid:
- * - "Invalid input query parameter: truth1" if `truth1` is missing or invalid.
- * - "Invalid input query parameter: truth2" if `truth2` is missing or invalid.
- * - "Invalid input query parameter: lie" if `lie` is missing or invalid.
- * - "Invalid input query parameter: competitors" if `competitors` is missing, not a number, or not a positive number.
- * - "Invalid input query parameter: amount" if `amount` is missing, not a number, or not a positive number.
- */
 export function validatedCreateChallengeQueryParams(requestUrl: URL) {
-  let truth1: string;
-  let truth2: string;
-  let lie: string;
-  let competitors: number;
+  let vert_set: string;
+  let hor_set: string;
   let amount: number;
 
   try {
-    truth1 = requestUrl.searchParams.get("truth1")!;
-    if (!truth1) throw "truth1 is required";
+    vert_set = requestUrl.searchParams.get("vert_set")!;
+    if (!vert_set) throw "vert_set is required";
   } catch (err) {
-    throw "Invalid input query parameter: truth1";
+    throw "Invalid input query parameter: vert_set";
   }
 
   try {
-    truth2 = requestUrl.searchParams.get("truth2")!;
-    if (!truth2) throw "truth2 is required";
+    hor_set = requestUrl.searchParams.get("hor_set")!;
+    if (!hor_set) throw "hor_set is required";
   } catch (err) {
-    throw "Invalid input query parameter: truth2";
-  }
-
-  try {
-    lie = requestUrl.searchParams.get("lie")!;
-    if (!lie) throw "lie is required";
-  } catch (err) {
-    throw "Invalid input query parameter: lie";
-  }
-
-  try {
-    competitors = parseInt(requestUrl.searchParams.get("competitors")!);
-    if (isNaN(competitors) || competitors <= 0)
-      throw "competitors should be a positive number";
-  } catch (err) {
-    throw "Invalid input query parameter: competitors";
+    throw "Invalid input query parameter: hor_set";
   }
 
   try {
@@ -60,10 +25,8 @@ export function validatedCreateChallengeQueryParams(requestUrl: URL) {
   }
 
   return {
-    truth1,
-    truth2,
-    lie,
-    competitors,
+    vert_set,
+    hor_set,
     amount,
   };
 }
@@ -102,11 +65,13 @@ export function validatedChallengeQueryParams(requestUrl: URL) {
  * - `bet` must be present.
  */
 export function validatedPOSTChallengeQueryParams(requestUrl: URL): {
-  guess: number;
+  vert_set: string;
+  hor_set: string;
   bet: string;
   challengeId: string;
 } {
-  let guess: number;
+  let vert_set: string;
+  let hor_set: string;
   let bet: string;
   let challengeId: string;
 
@@ -118,13 +83,18 @@ export function validatedPOSTChallengeQueryParams(requestUrl: URL): {
   }
 
   try {
-    guess = parseInt(requestUrl.searchParams.get("guess")!);
-    if (isNaN(guess) || guess < 0 || guess > 2)
-      throw "guess should be a number between 0 and 2";
+    vert_set = requestUrl.searchParams.get("vert_set")!;
+    if (!vert_set) throw "vert_set is required";
   } catch (err) {
-    throw "Invalid input query parameter: guess";
+    throw "Invalid input query parameter: vert_set";
   }
 
+  try {
+    hor_set = requestUrl.searchParams.get("hor_set")!;
+    if (!hor_set) throw "hor_set is required";
+  } catch (err) {
+    throw "Invalid input query parameter: hor_set";
+  }
   try {
     bet = requestUrl.searchParams.get("bet")!;
     if (!bet) throw "bet is required";
@@ -133,22 +103,37 @@ export function validatedPOSTChallengeQueryParams(requestUrl: URL): {
   }
 
   return {
-    guess,
+    vert_set,
+    hor_set,
     bet,
     challengeId,
   };
 }
 
 /**
- * Shuffles an array of strings in place using the Fisher-Yates algorithm.
+ * Calculates the grid index based on the provided vertical and horizontal sets.
  *
- * @param array - The array of strings to shuffle.
- * @returns The shuffled array.
+ * @param vert_set - The vertical position, which can be 'top', 'middle', or 'bottom'.
+ * @param hor_set - The horizontal position, which can be 'left', 'middle', or 'right'.
+ * @returns The calculated grid index as a number.
  */
-export function shuffleArray(array: string[]) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
+export function calculateGridIndex(vert_set: string, hor_set: string): number {
+  const verticalMap: { [key: string]: number } = {
+    top: 0,
+    middle: 1,
+    bottom: 2,
+  };
+
+  const horizontalMap: { [key: string]: number } = {
+    left: 0,
+    middle: 1,
+    right: 2,
+  };
+
+  const verticalIndex = verticalMap[vert_set.toLowerCase()];
+  const horizontalIndex = horizontalMap[hor_set.toLowerCase()];
+
+  // console.log("verticalIndex", verticalIndex * 3 + horizontalIndex);
+
+  return verticalIndex * 3 + horizontalIndex;
 }

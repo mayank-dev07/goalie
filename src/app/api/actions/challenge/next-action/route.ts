@@ -1,10 +1,9 @@
+import { addChallenger, getChallenge } from "@/lib/dbUtils";
 import {
-  addChallenger,
-  getChallenge,
-  markChallengeAsComplete,
-} from "@/lib/dbUtils";
-import { validatedPOSTChallengeQueryParams } from "@/lib/helper";
-import { sendPayouts } from "@/lib/payout.helper";
+  calculateGridIndex,
+  validatedPOSTChallengeQueryParams,
+} from "@/lib/helper";
+// import { sendPayouts } from "@/lib/payout.helper";
 import {
   createActionHeaders,
   ActionError,
@@ -57,7 +56,7 @@ export const OPTIONS = async () => Response.json(null, { headers });
 export const POST = async (req: Request) => {
   try {
     const requestUrl = new URL(req.url);
-    const { guess, bet, challengeId } =
+    const { vert_set, hor_set, bet, challengeId } =
       validatedPOSTChallengeQueryParams(requestUrl);
     const body: NextActionPostRequest = await req.json();
 
@@ -89,33 +88,20 @@ export const POST = async (req: Request) => {
       const actionError: ActionError = { message: "Challenge not found" };
       return Response.json(actionError, { status: 404, headers });
     }
+    console.log("challenge");
+    console.log(vert_set, hor_set, bet, challengeId);
+
+    const gridIndex = calculateGridIndex(vert_set, hor_set) + 1;
+    console.log("selected grid", gridIndex);
+
     try {
       await addChallenger(
         challengeId,
         account.toBase58(),
         signature,
-        challenge.lieIndex === guess
+        gridIndex,
+        challenge.selectedGrid === gridIndex
       );
-
-      if (
-        challenge.maxChallengers ===
-        challenge.correctGuessesSig.length +
-          challenge.incorrectGuessesSig.length +
-          1
-      ) {
-        console.log("Sending Payouts");
-
-        // Run sendPayouts asynchronously in the background
-        sendPayouts(challengeId)
-          .then(() => {
-            console.log("Payouts sent successfully");
-            markChallengeAsComplete(challengeId);
-          })
-          .catch((err) => {
-            console.error("Error sending payouts:", err);
-          });
-        console.log("Payouts scheduled");
-      }
     } catch (err) {
       console.error("Error adding challenger:", err);
       const actionError: ActionError = { message: "Failed to add challenger" };
