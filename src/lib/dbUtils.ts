@@ -35,15 +35,14 @@ export async function getUser(wallet: string) {
 }
 
 /**
- * Creates a new challenge with the specified parameters.
+ * Creates a new challenge in the database.
+ *
  * @param wallet - The wallet address of the user creating the challenge.
- * @param maxChallengers - The maximum number of challengers allowed.
- * @param statements - An array of three statements.
- * @param gridIndex - The index of the lie in the statements array.
- * @param totalAmount - The total amount to be bet on the challenge.
- * @param createChallengeSig - The signature of the create challenge transaction.
- * @returns The ID of the newly created challenge.
- * @throws Will throw an error if the number of statements is not 3 or if the gridIndex is out of range.
+ * @param gridIndex - The index of the grid where the challenge is created. Must be between 1 and 9.
+ * @param totalAmount - The total amount associated with the challenge.
+ * @param createChallengeSig - The signature for creating the challenge.
+ * @returns The ID of the created challenge.
+ * @throws Will throw an error if the gridIndex is not between 1 and 9.
  */
 export async function createChallenge(
   wallet: string,

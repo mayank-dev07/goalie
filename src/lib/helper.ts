@@ -126,7 +126,7 @@ export function calculateGridIndex(vert_set: string, hor_set: string): number {
 
   const horizontalMap: { [key: string]: number } = {
     left: 0,
-    middle: 1,
+    center: 1,
     right: 2,
   };
 
