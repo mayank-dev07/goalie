@@ -93,6 +93,7 @@ export const POST = async (req: Request) => {
 
     const gridIndex = calculateGridIndex(vert_set, hor_set) + 1;
     console.log("selected grid", gridIndex);
+    console.log(challenge);
 
     try {
       await addChallenger(
@@ -100,7 +101,7 @@ export const POST = async (req: Request) => {
         account.toBase58(),
         signature,
         gridIndex,
-        challenge.selectedGrid === gridIndex
+        challenge.gridIndex === gridIndex
       );
     } catch (err) {
       console.error("Error adding challenger:", err);

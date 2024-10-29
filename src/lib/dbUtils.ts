@@ -148,6 +148,8 @@ export async function addChallenger(
   selected: number,
   correct: boolean
 ) {
+  console.log(correct, "correct");
+
   const existingWallet = await db.user.findUnique({
     where: { wallet },
   });
