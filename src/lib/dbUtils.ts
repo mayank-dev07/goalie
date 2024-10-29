@@ -166,7 +166,7 @@ export async function addChallenger(
         },
       },
       selectedGrid: selected,
-      [correct ? "correctGuessesSig" : "correctGuessesSig"]: {
+      [correct ? "correctGuessesSig" : "incorrectGuessesSig"]: {
         push: guessSignature,
       },
     },
@@ -219,4 +219,8 @@ export function updateTransaction(
       Timestamp: timestamp,
     },
   });
+}
+
+export function getAllChallenges() {
+  return db.challenge.findMany();
 }

@@ -1,2 +1,2 @@
-export const vaultPublicKey = "AkS5coPHbYjv5k9ZvDucWodQhPmn2f9NjRzoTBQjABGh";
-export const platformFee = 0.02 // 2%
+export const vaultPublicKey = "ECdDp63uPuG6yWkj7g7kP51JtP2CTcAi2Bn3F21H1nBz";
+export const platformFee = 0.02; // 2%

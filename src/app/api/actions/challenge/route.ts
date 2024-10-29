@@ -127,7 +127,7 @@ export const GET = async (req: Request) => {
                 label: `Match Bid: ${challenge.totalAmount} SOL`,
                 value: "play",
               },
-              { label: "Give Up", value: "giveup" },
+              // { label: "Give Up", value: "giveup" },
             ],
           },
         ],
