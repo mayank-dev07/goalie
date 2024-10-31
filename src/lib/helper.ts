@@ -7,6 +7,8 @@ export function validatedCreateChallengeQueryParams(requestUrl: URL) {
     vert_set = requestUrl.searchParams.get("vert_set")!;
     if (!vert_set) throw "vert_set is required";
   } catch (err) {
+    console.log(err);
+
     throw "Invalid input query parameter: vert_set";
   }
 
@@ -14,6 +16,8 @@ export function validatedCreateChallengeQueryParams(requestUrl: URL) {
     hor_set = requestUrl.searchParams.get("hor_set")!;
     if (!hor_set) throw "hor_set is required";
   } catch (err) {
+    console.log(err);
+
     throw "Invalid input query parameter: hor_set";
   }
 
@@ -21,6 +25,8 @@ export function validatedCreateChallengeQueryParams(requestUrl: URL) {
     amount = parseFloat(requestUrl.searchParams.get("amount")!);
     if (isNaN(amount) || amount <= 0) throw "amount is too small";
   } catch (err) {
+    console.log(err);
+
     throw "Invalid input query parameter: amount";
   }
 
@@ -44,6 +50,8 @@ export function validatedChallengeQueryParams(requestUrl: URL) {
     challengeId = requestUrl.searchParams.get("challengeId")!;
     if (!challengeId) throw "challengeId is required";
   } catch (err) {
+    console.log(err);
+
     throw "Invalid input query parameter: challengeId";
   }
 
@@ -79,6 +87,8 @@ export function validatedPOSTChallengeQueryParams(requestUrl: URL): {
     challengeId = requestUrl.searchParams.get("challengeId")!;
     if (!challengeId) throw "challengeId is required";
   } catch (err) {
+    console.log(err);
+
     throw "Invalid input query parameter: challengeId";
   }
 
@@ -86,6 +96,8 @@ export function validatedPOSTChallengeQueryParams(requestUrl: URL): {
     vert_set = requestUrl.searchParams.get("vert_set")!;
     if (!vert_set) throw "vert_set is required";
   } catch (err) {
+    console.log(err);
+
     throw "Invalid input query parameter: vert_set";
   }
 
@@ -93,12 +105,16 @@ export function validatedPOSTChallengeQueryParams(requestUrl: URL): {
     hor_set = requestUrl.searchParams.get("hor_set")!;
     if (!hor_set) throw "hor_set is required";
   } catch (err) {
+    console.log(err);
+
     throw "Invalid input query parameter: hor_set";
   }
   try {
     bet = requestUrl.searchParams.get("bet")!;
     if (!bet) throw "bet is required";
   } catch (err) {
+    console.log(err);
+
     throw "Invalid input query parameter: bet";
   }
 

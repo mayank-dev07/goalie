@@ -108,6 +108,7 @@ export const POST = async (req: Request) => {
     try {
       account = new PublicKey(body.account);
     } catch (err) {
+      console.log(err);
       throw 'Invalid "account" provided';
     }
 

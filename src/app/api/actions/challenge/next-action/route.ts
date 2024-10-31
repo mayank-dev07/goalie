@@ -21,6 +21,7 @@ const headers = createActionHeaders();
  * @returns A response indicating the method is not supported.
  */
 export const GET = async (req: Request) => {
+  console.log(req);
   return Response.json({ message: "Method not supported" }, { headers });
 };
 
@@ -65,6 +66,8 @@ export const POST = async (req: Request) => {
     try {
       account = new PublicKey(body.account);
     } catch (err) {
+      console.log(err);
+
       throw 'Invalid "account" provided';
     }
 
@@ -73,6 +76,8 @@ export const POST = async (req: Request) => {
       signature = body.signature!;
       if (!signature) throw "Invalid signature";
     } catch (err) {
+      console.log(err);
+
       throw 'Invalid "signature" provided';
     }
 
@@ -119,7 +124,7 @@ export const POST = async (req: Request) => {
     return Response.json(payload, { headers });
   } catch (err) {
     console.error(err);
-    let actionError: ActionError = { message: "An unknown error occurred" };
+    const actionError: ActionError = { message: "An unknown error occurred" };
     if (typeof err == "string") actionError.message = err;
     return Response.json(actionError, {
       status: 400,

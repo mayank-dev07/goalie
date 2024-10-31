@@ -166,6 +166,7 @@ export const POST = async (req: Request) => {
     try {
       account = new PublicKey(body.account);
     } catch (err) {
+      console.log(err);
       throw 'Invalid "account" provided';
     }
 
@@ -226,7 +227,7 @@ export const POST = async (req: Request) => {
     return Response.json(payload, { headers });
   } catch (err) {
     console.log(err);
-    let actionError: ActionError = { message: "An unknown error occurred" };
+    const actionError: ActionError = { message: "An unknown error occurred" };
     if (typeof err == "string") actionError.message = err;
     return Response.json(actionError, {
       status: 400,

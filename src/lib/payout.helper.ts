@@ -158,6 +158,7 @@ export async function transferSolWithKeypair(
 
 export async function sendPayouts(challengeId: string) {
   const connection = new Connection(clusterApiUrl("devnet"));
+  console.log(connection);
 
   let payerPublicKey: PublicKey;
   try {
